@@ -3,8 +3,8 @@ var bcrypt = require('bcrypt-nodejs');
 
 var crypt = {};
 
-crypt.createHash = function (data, successCallback, failureCallback) {
-    bcrypt.genSalt(10, function (err, salt) {
+crypt.createHash = (data, successCallback, failureCallback) => {
+    bcrypt.genSalt(10, (err, salt) => {
         if (err) {
             failureCallback(err);
             return;
@@ -19,8 +19,8 @@ crypt.createHash = function (data, successCallback, failureCallback) {
     });
 };
 
-crypt.compareHash = function (data, encrypted, successCallback, failureCallback) {
-    bcrypt.compare(data, encrypted, function (err, isMatch) {
+crypt.compareHash = (data, encrypted, successCallback, failureCallback) => {
+    bcrypt.compare(data, encrypted, (err, isMatch) => {
         if (err) {
             failureCallback(err);
             return;

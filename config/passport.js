@@ -5,19 +5,18 @@ var db = require('../app/helpers/db');
 var config = require('../config/main');
 
 // Setup work and export for the JWT passport strategy
-module.exports = function (passport) {
+module.exports = (passport) => {
     var opts = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
         secretOrKey: config.secret
     };
 
-    passport.use(new JwtStrategy(opts, function (jwt_payload, callback) {
-        console.log(jwt_payload);
-        db.findUser({email: jwt_payload.user_email}, function (res) {
+    passport.use(new JwtStrategy(opts, (jwt_payload, callback) => {
+        db.findUser({ email: jwt_payload.user_email }, (res) => {
             var user = res;
             delete user.password;
             callback(null, user);
-        }, function (err) {
+        }, (err) => {
             return callback(err, false);
         });
     }));

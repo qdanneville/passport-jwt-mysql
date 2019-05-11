@@ -7,7 +7,8 @@ var db = require('../helpers/db');
 
 module.exports = {
     authenticate,
-    register
+    register,
+    updateType,
 };
 
 
@@ -21,9 +22,9 @@ function register(userParam, callback) {
         };
 
         // Attempt to save the user
-        db.createUser(newUser, function (res) {
+        db.createUser(newUser, (res) => {
             return callback({ success: true, message: 'Successfully created new user.' });
-        }, function (err) {
+        }, (err) => {
             return callback({ success: false, message: 'That email address already exists.' });
         });
     }
@@ -32,7 +33,7 @@ function register(userParam, callback) {
 function authenticate({ email, password }, callback) {
     db.findUser({
         email: email
-    }, function (res) {
+    }, (res) => {
         var user = {
             user_id: res.user_id,
             user_email: res.user_email,
@@ -41,7 +42,7 @@ function authenticate({ email, password }, callback) {
         };
 
         // Check if password matches
-        crypt.compareHash(password, res.password, function (err, isMatch) {
+        crypt.compareHash(password, res.password, (err, isMatch) => {
             if (isMatch && !err) {
                 // Create token if the password matched and no error was thrown
                 var token = jwt.sign(user, config.secret, {
@@ -55,7 +56,29 @@ function authenticate({ email, password }, callback) {
                 });
             }
         });
-    }, function (err) {
+    }, (err) => {
         return callback({ success: false, message: 'Authentication failed. User not found.' });
     });
+}
+
+
+function updateType(request, callback) {
+    db.findUser({
+        email: request.user.user_email
+    }, (res) => {
+        let updatedUser = {
+            user_id: request.user.user_id,
+            user_type: request.body.user_type
+        }
+
+        db.updateUserType(
+            updatedUser
+            , (res) => {
+                return callback({ success: true, message: 'Successfully updated user.' });
+            }, (err) => {
+                return callback({ success: false, message: "Update failed. User type wasn't valid" });
+            })
+    }, (err) => {
+        return callback({ success: false, message: 'Update failed. User not found.' });
+    })
 }

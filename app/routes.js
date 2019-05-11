@@ -6,7 +6,7 @@ var express = require('express');
 var requireAuth = passport.authenticate('jwt', { session: false });
 
 // Export the routes for our app to use
-module.exports = function (app) {
+module.exports = (app) => {
     // API Route Section
 
     // Initialize passport for use
@@ -20,7 +20,7 @@ module.exports = function (app) {
     var userRoutes = require("./users/users.controller")
 
     //Protected authenticated route with JWT
-    apiRoutes.get('/dashboard', requireAuth, function (request, response) {
+    apiRoutes.get('/dashboard', requireAuth, (request, response) => {
         response.send('It worked User id is: ' + request.user.user_id + ', Email id is: ' + request.user.user_email + '.');
     });
 

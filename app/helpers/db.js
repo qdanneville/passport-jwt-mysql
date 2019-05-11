@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
 });
 
 //Connecting to database
-connection.connect(function(err) {
+connection.connect((err) => {
   if (err) {
     console.error("error connecting: " + err.stack);
     return;
@@ -21,39 +21,31 @@ connection.connect(function(err) {
   console.log("connected as id " + connection.threadId);
 });
 
-db.createUser = function(user, successCallback, failureCallback) {
+db.createUser = (user, successCallback, failureCallback) => {
   var passwordHash;
-  crypt.createHash(
-    user.password,
-    function(res) {
-      passwordHash = res;
-      connection.query(
-        "INSERT INTO `passport-auth`.`users` (`user_email`, `password`) VALUES ('" +
-          user.email +
-          "', '" +
-          passwordHash +
-          "');",
-        function(err, rows, fields, res) {
-          if (err) {
-            failureCallback(err);
-            return;
-          }
-          successCallback();
+  crypt.createHash(user.password, (res) => {
+    passwordHash = res;
+    connection.query("INSERT INTO `passport-auth`.`users` (`user_email`, `password`) VALUES ('" + user.email + "', '" + passwordHash + "');"
+      , function (err, rows, fields, res) {
+        if (err) {
+          failureCallback(err);
+          return;
         }
-      );
-    },
-    function(err) {
+        successCallback();
+      }
+    );
+  },
+    (err) => {
       failureCallback();
     }
   );
 };
 
-db.findUser = function(user, successCallback, failureCallback) {
+db.findUser = (user, successCallback, failureCallback) => {
   var sqlQuery =
-    "SELECT * FROM `passport-auth`.users WHERE `user_email` = '" +
-    user.email +
-    "';";
-  connection.query(sqlQuery, function(err, rows, fields, res) {
+    "SELECT * FROM `passport-auth`.users WHERE `user_email` = '" + user.email + "';";
+
+  connection.query(sqlQuery, (err, rows, fields, res) => {
     if (err) {
       failureCallback(err);
       return;
@@ -65,5 +57,18 @@ db.findUser = function(user, successCallback, failureCallback) {
     }
   });
 };
+
+db.updateUserType = (user, successCallback, failureCallback) => {
+
+  var sqlQuery = "UPDATE `users` SET `user_type`= " + user.user_type + " WHERE user_id = " + user.user_id;
+
+  connection.query(sqlQuery, (err, row, fields, res) => {
+    if (err) {
+      failureCallback(err);
+      return;
+    }
+    successCallback();
+  })
+}
 
 module.exports = db;
